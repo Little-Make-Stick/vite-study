@@ -107,13 +107,75 @@ export default defineConfig({
        * default: 在 Vite 核心插件之后调用该插件
        * post: 在 Vite 构建插件之后调用该插件
        * ****************************************/
-      enforce: 'pre',
+      enforce: "pre",
       /* *************** apply ******************
        * serve: 开发 (serve)  模式中会调用
        * built: 生产 (build)  模式中会调用
        * ****************************************/
-      apply: 'build',
+      apply: "build",
     }),
   ],
 });
 ```
+
+#### 引入 public 文件夹下的路径
+
+引入 public 中的资源永远应该使用根绝对路径 —— 举个例子，`public/icon.png` 应该在源码中被引用为 `/icon.png`。
+
+#### new URL
+
+```js
+function getImageUrl(name) {
+  return new URL(`./dir/${name}.png`, import.meta.url).href;
+}
+```
+
+#### vite.config.js
+
+* 多页面应用模式
+
+  ```js
+  const { resolve } = require('path')
+  const { defineConfig } = require('vite')
+
+  module.exports = defineConfig({
+    build: {
+      rollupOptions: {
+        input: {
+          // 在解析输入路径时，__dirname 的值将仍然是 vite.config.js 文件所在的目录
+          main: resolve(__dirname, 'index.html'),
+          nested: resolve(__dirname, 'nested/index.html')
+        }
+      }
+    }
+  })
+  ```
+
+
+* 库模式
+
+  ```js
+  const path = require('path')
+  const { defineConfig } = require('vite')
+
+  module.exports = defineConfig({
+    build: {
+      lib: {
+        entry: path.resolve(__dirname, 'lib/main.js'),
+        name: 'MyLib',
+        fileName: (format) => `my-lib.${format}.js`
+      },
+      rollupOptions: {
+        // 确保外部化处理那些你不想打包进库的依赖
+        external: ['vue'],
+        output: {
+          // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
+          globals: {
+            vue: 'Vue'
+          }
+        }
+      }
+    }
+  })
+  ```
+

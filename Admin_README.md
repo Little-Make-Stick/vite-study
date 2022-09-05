@@ -132,3 +132,9 @@
   github地址: https://github.com/akveo/blur-admin
   演示地址: https://www.akveo.com/blur-admin-mint/?__hstc=251808470.20f8fbcdf3b5eb16fc64f0bf635e4207.1662342462419.1662342462419.1662348321065.2&__hssc=251808470.1.1662348321065&__hsfp=1376655195#/dashboard
   文档地址: hhttps://akveo.github.io/blur-admin/articles/001-getting-started/
+
+### BootstrapBlazor
+
+  gitee地址: https://gitee.com/LongbowEnterprise/BootstrapBlazor/
+  演示地址: https://admin.blazor.zone/Account/Login (Admin  123789)
+  文档地址: https://wasm.blazor.zone/introduction

@@ -217,3 +217,6 @@ NODE_ENV=development
 VITE_APP_TITLE=My App
 # 只有VITE_APP_TITLE 会被暴露为 `import.meta.env.VITE_APP_TITLE` 提供给客户端源码
 ```
+
+自定义模式及模式配置参数
+https://vitejs.cn/guide/env-and-mode.html#modes

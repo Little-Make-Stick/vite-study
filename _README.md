@@ -134,48 +134,86 @@ function getImageUrl(name) {
 
 * 多页面应用模式
 
-  ```js
-  const { resolve } = require('path')
-  const { defineConfig } = require('vite')
+    在开发过程中，简单地导航或链接到 /nested/ - 将会按预期工作，与正常的静态文件服务器表现一致。
 
-  module.exports = defineConfig({
-    build: {
-      rollupOptions: {
-        input: {
-          // 在解析输入路径时，__dirname 的值将仍然是 vite.config.js 文件所在的目录
-          main: resolve(__dirname, 'index.html'),
-          nested: resolve(__dirname, 'nested/index.html')
+    在构建过程中，你只需指定多个 .html 文件作为入口点即可：
+
+    ```js
+    const { resolve } = require('path')
+    const { defineConfig } = require('vite')
+
+    module.exports = defineConfig({
+      build: {
+        rollupOptions: {
+          input: {
+            // 在解析输入路径时，__dirname 的值将仍然是 vite.config.js 文件所在的目录
+            main: resolve(__dirname, 'index.html'),
+            nested: resolve(__dirname, 'nested/index.html')
+          }
         }
       }
-    }
-  })
-  ```
+    })
+    ```
 
 
 * 库模式
 
-  ```js
-  const path = require('path')
-  const { defineConfig } = require('vite')
+    ```js
+    const path = require('path')
+    const { defineConfig } = require('vite')
 
-  module.exports = defineConfig({
-    build: {
-      lib: {
-        entry: path.resolve(__dirname, 'lib/main.js'),
-        name: 'MyLib',
-        fileName: (format) => `my-lib.${format}.js`
-      },
-      rollupOptions: {
-        // 确保外部化处理那些你不想打包进库的依赖
-        external: ['vue'],
-        output: {
-          // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
-          globals: {
-            vue: 'Vue'
+    module.exports = defineConfig({
+      build: {
+        lib: {
+          entry: path.resolve(__dirname, 'lib/main.js'),
+          name: 'MyLib',
+          fileName: (format) => `my-lib.${format}.js`
+        },
+        rollupOptions: {
+          // 确保外部化处理那些你不想打包进库的依赖
+          external: ['vue'],
+          output: {
+            // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
+            globals: {
+              vue: 'Vue'
+            }
           }
         }
       }
-    }
-  })
-  ```
+    })
+    ```
 
+#### 调试
+
+```json
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview --port 8080"
+},
+
+// npm run dev: 构建测试环境，运行在本地
+
+/*
+ * npm run build: 构建生产环境，将项目打包成dist
+ * npm run preview: 部署在本地，默认搭建在localhost:5000/ 环境下，预览生产环境下的运行结果
+ * "vite preview --port 8080": 设置部署在本地 8080 端口下
+ */
+```
+
+#### .env
+
+```js
+  .env                # 所有情况下都会加载
+  .env.local          # 所有情况下都会加载，但会被 git 忽略
+  .env.[mode]         # 只在指定模式下加载
+  .env.[mode].local   # 只在指定模式下加载，但会被 git 忽略
+```
+
+为了防止意外地将一些环境变量泄漏到客户端，只有以 VITE_ 为前缀的变量才会暴露给经过 vite 处理的代码。
+
+```js
+NODE_ENV=development
+VITE_APP_TITLE=My App
+# 只有VITE_APP_TITLE 会被暴露为 `import.meta.env.VITE_APP_TITLE` 提供给客户端源码
+```
